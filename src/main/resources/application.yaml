@@ -1,0 +1,11 @@
+spring:
+  main:
+    banner-mode: off
+
+# Prometheus
+management:
+  endpoints:
+    web:
+      base-path: "/internal"
+      exposure:
+        include: info, health, metrics, prometheus
