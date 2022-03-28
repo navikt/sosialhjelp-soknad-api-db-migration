@@ -1,6 +1,8 @@
 spring:
   main:
     banner-mode: off
+  flyway:
+    enabled: true
 
 # Prometheus
 management:
