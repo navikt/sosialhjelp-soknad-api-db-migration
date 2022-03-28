@@ -15,6 +15,7 @@ object Versions {
     // test
     const val junit = "5.8.2"
     const val mockk = "1.12.2"
+    const val h2 = "2.1.210"
 }
 
 plugins {
@@ -56,6 +57,7 @@ dependencies {
     implementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusJoseJwt}")
     implementation("net.logstash.logback:logstash-logback-encoder:${Versions.logstash}")
 
+    testRuntimeOnly("com.h2database:h2:${Versions.h2}")
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
     testImplementation("io.mockk:mockk:${Versions.mockk}")
     testImplementation("org.springframework.boot:spring-boot-starter-test:${Versions.springboot}")
