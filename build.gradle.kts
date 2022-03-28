@@ -73,5 +73,5 @@ tasks.withType<Test> {
 }
 
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
-    this.archiveFileName.set("migration-app.jar")
+    this.archiveFileName.set("sosialhjelp-soknad-api-db-migration.jar")
 }
