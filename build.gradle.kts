@@ -3,6 +3,8 @@ object Versions {
     const val springboot = "2.6.4"
     const val kotlin = "1.6.10"
     const val coroutines = "1.6.0"
+    const val flyway = "8.4.4"
+    const val postgresql = "42.3.3"
     const val jackson = "2.13.2"
     const val micrometer = "1.8.3"
     const val javaJwt = "3.19.0"
@@ -20,6 +22,7 @@ plugins {
     kotlin("plugin.spring") version "1.6.10"
     id("org.springframework.boot") version "2.6.4"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("org.flywaydb.flyway") version "8.4.4"
 }
 
 group = "no.nav.sosialhjelp"
@@ -40,6 +43,11 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-webflux:${Versions.springboot}")
     implementation("org.springframework.boot:spring-boot-starter-actuator:${Versions.springboot}")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc:${Versions.springboot}")
+
+    implementation("org.flywaydb:flyway-core:${Versions.flyway}")
+    implementation("org.postgresql:postgresql:${Versions.postgresql}")
+
     implementation("io.micrometer:micrometer-registry-prometheus:${Versions.micrometer}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:${Versions.coroutines}")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jackson}")
