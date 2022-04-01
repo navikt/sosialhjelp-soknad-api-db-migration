@@ -1,29 +1,29 @@
 
 object Versions {
-    const val springboot = "2.6.4"
+    const val springboot = "2.6.6"
     const val kotlin = "1.6.10"
     const val coroutines = "1.6.0"
-    const val flyway = "8.4.4"
+    const val flyway = "8.5.5"
     const val postgresql = "42.3.3"
     const val jackson = "2.13.2"
-    const val micrometer = "1.8.3"
-    const val javaJwt = "3.19.0"
-    const val jwksRsa = "0.21.0"
+    const val micrometer = "1.8.4"
+    const val javaJwt = "3.19.1"
+    const val jwksRsa = "0.21.1"
     const val logstash = "7.0.1"
-    const val nimbusJoseJwt = "9.20"
+    const val nimbusJoseJwt = "9.21"
 
     // test
     const val junit = "5.8.2"
-    const val mockk = "1.12.2"
+    const val mockk = "1.12.3"
     const val h2 = "2.1.210"
 }
 
 plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.spring") version "1.6.10"
-    id("org.springframework.boot") version "2.6.4"
+    id("org.springframework.boot") version "2.6.6"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
-    id("org.flywaydb.flyway") version "8.4.4"
+    id("org.flywaydb.flyway") version "8.5.5"
 }
 
 group = "no.nav.sosialhjelp"
