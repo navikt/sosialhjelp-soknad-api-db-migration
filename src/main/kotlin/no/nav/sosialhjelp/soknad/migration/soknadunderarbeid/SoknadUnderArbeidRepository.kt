@@ -66,7 +66,7 @@ class SoknadUnderArbeidRepository(
         )
     }
 
-    fun slettSoknad(soknadUnderArbeid: SoknadUnderArbeidDto) {
+    fun slett(soknadUnderArbeid: SoknadUnderArbeidDto) {
         transactionTemplate.execute(object : TransactionCallbackWithoutResult() {
             override fun doInTransactionWithoutResult(transactionStatus: TransactionStatus) {
                 val soknadUnderArbeidId = soknadUnderArbeid.soknadId
