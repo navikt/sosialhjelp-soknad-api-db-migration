@@ -1,19 +1,19 @@
-package no.nav.sosialhjelp.soknad.migration.opplastetvedlegg
+package no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.dto
 
-data class OpplastetVedlegg(
-    var uuid: String,
-    var eier: String,
-    var vedleggType: OpplastetVedleggType,
-    var data: ByteArray,
-    var soknadId: Long,
-    var filnavn: String,
-    var sha512: String
+data class OpplastetVedleggDto(
+    val uuid: String,
+    val eier: String,
+    val vedleggType: OpplastetVedleggType,
+    val data: ByteArray,
+    val soknadId: Long,
+    val filnavn: String,
+    val sha512: String
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as OpplastetVedlegg
+        other as OpplastetVedleggDto
 
         if (uuid != other.uuid) return false
         if (eier != other.eier) return false
@@ -39,5 +39,5 @@ data class OpplastetVedlegg(
 }
 
 data class OpplastetVedleggType(
-    var sammensattType: String
+    val sammensattType: String
 )
