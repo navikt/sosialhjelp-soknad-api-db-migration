@@ -19,7 +19,7 @@ create index index_status_forsok_id on oppgave (status, nesteforsok);
 
 create table soknad_under_arbeid
 (
-    soknad_under_arbeid_id  numeric(19, 0) primary key,
+    soknad_under_arbeid_id  serial primary key,
     versjon                 integer      not null default 1,
     behandlingsid           varchar(255) not null unique,
     tilknyttetbehandlingsid varchar(255),
@@ -27,14 +27,15 @@ create table soknad_under_arbeid
     data                    bytea,
     status                  varchar(255) not null,
     opprettetdato           timestamp    not null,
-    sistendretdato          timestamp    not null
+    sistendretdato          timestamp    not null,
+    old_id                  integer      not null unique
 );
 
 create index index_soknadua_tilknbehid on soknad_under_arbeid (tilknyttetbehandlingsid);
 create index index_soknadua_eier on soknad_under_arbeid (eier);
 create index index_soknadua_oppr on soknad_under_arbeid (status, opprettetdato);
 create index index_soknadua_endr on soknad_under_arbeid (status, sistendretdato);
-create sequence soknad_under_arbeid_id_seq start with 1 increment by 1;
+-- create sequence soknad_under_arbeid_id_seq start with 1 increment by 1;
 
 create table opplastet_vedlegg
 (
