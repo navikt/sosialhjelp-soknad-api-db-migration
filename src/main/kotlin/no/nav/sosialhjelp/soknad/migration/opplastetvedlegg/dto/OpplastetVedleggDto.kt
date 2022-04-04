@@ -1,7 +1,6 @@
 package no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.dto
 
 data class OpplastetVedleggDto(
-    val id: Long,
     val uuid: String,
     val eier: String,
     val vedleggType: OpplastetVedleggType,
