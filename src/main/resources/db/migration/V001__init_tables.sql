@@ -75,7 +75,7 @@ create index index_sendtsoknad_sendt on sendt_soknad (sendtdato);
 
 create table soknadmetadata
 (
-    id                      numeric(19, 0) primary key,
+    id                      serial primary key,
     behandlingsid           varchar(255) not null,
     tilknyttetbehandlingsid varchar(255),
     skjema                  varchar(255),
@@ -91,10 +91,11 @@ create table soknadmetadata
     sistendretdato          timestamp,
     innsendtdato            timestamp,
     batchstatus             varchar(255) not null default 'LEDIG',
-    lest_ditt_nav           boolean      not null default false
+    lest_ditt_nav           boolean      not null default false,
+    old_id                  integer      not null unique
 );
 
 create index index_metadata_id on soknadmetadata (id);
 create index index_metadata_behid on soknadmetadata (behandlingsid);
 create index index_tilknyttet_id on soknadmetadata (tilknyttetbehandlingsid);
-create sequence metadata_id_seq start with 1 increment by 1;
+-- create sequence metadata_id_seq start with 1 increment by 1;

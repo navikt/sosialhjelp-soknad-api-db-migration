@@ -1,4 +1,4 @@
-package no.nav.sosialhjelp.soknad.migration.soknadmetadata
+package no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain
 
 import no.nav.sbl.soknadsosialhjelp.vedlegg.JsonVedlegg
 import no.nav.sosialhjelp.soknad.migration.utils.JAXBHelper
@@ -20,7 +20,8 @@ data class SoknadMetadata(
     var opprettetDato: LocalDateTime,
     var sistEndretDato: LocalDateTime,
     var innsendtDato: LocalDateTime? = null,
-    var lestDittNav: Boolean = false
+    var lestDittNav: Boolean = false,
+    var oldId: Long
 )
 
 @XmlRootElement
