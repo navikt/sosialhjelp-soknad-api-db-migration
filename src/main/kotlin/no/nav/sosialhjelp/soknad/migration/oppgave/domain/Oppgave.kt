@@ -1,4 +1,4 @@
-package no.nav.sosialhjelp.soknad.migration.oppgave
+package no.nav.sosialhjelp.soknad.migration.oppgave.domain
 
 import com.migesok.jaxb.adapter.javatime.LocalDateTimeXmlAdapter
 import no.nav.sosialhjelp.soknad.migration.utils.JAXBHelper
@@ -18,7 +18,8 @@ data class Oppgave(
     var opprettet: LocalDateTime?,
     var sistKjort: LocalDateTime?,
     var nesteForsok: LocalDateTime?,
-    var retries: Int
+    var retries: Int,
+    var oldId: Long
 )
 
 enum class Status {

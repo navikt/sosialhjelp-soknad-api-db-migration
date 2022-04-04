@@ -1,6 +1,6 @@
 create table oppgave
 (
-    id              numeric(19, 0) primary key,
+    id              serial primary key,
     behandlingsid   varchar(255) not null,
     type            varchar(255),
     status          varchar(255),
@@ -10,7 +10,8 @@ create table oppgave
     opprettet       timestamp,
     sistkjort       timestamp,
     nesteforsok     timestamp,
-    retries         integer
+    retries         integer,
+    old_id          integer not null unique
 );
 
 create index index_status_forsok_id on oppgave (status, nesteforsok);
