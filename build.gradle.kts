@@ -11,6 +11,9 @@ object Versions {
     const val jwksRsa = "0.21.1"
     const val logstash = "7.0.1"
     const val nimbusJoseJwt = "9.21"
+    const val jakartaXml = "2.3.3"
+    const val jaxbJavaTimeAdapters = "1.1.3"
+    const val filformat = "1.2022.03.31-14.09-4daafcd63deb"
 
     // test
     const val junit = "5.8.2"
@@ -56,6 +59,12 @@ dependencies {
     implementation("com.auth0:jwks-rsa:${Versions.jwksRsa}")
     implementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusJoseJwt}")
     implementation("net.logstash.logback:logstash-logback-encoder:${Versions.logstash}")
+
+    implementation("no.nav.sbl.dialogarena:soknadsosialhjelp-filformat:${Versions.filformat}")
+
+    // xml
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:${Versions.jakartaXml}")
+    implementation("com.migesok:jaxb-java-time-adapters:${Versions.jaxbJavaTimeAdapters}")
 
     testRuntimeOnly("com.h2database:h2:${Versions.h2}")
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
