@@ -11,11 +11,11 @@ create table oppgave
     sistkjort       timestamp,
     nesteforsok     timestamp,
     retries         integer,
-    old_id          integer not null unique
+    old_id          integer      not null unique
 );
 
 create index index_status_forsok_id on oppgave (status, nesteforsok);
-create sequence oppgave_id_seq start with 1 increment by 1;
+-- create sequence oppgave_id_seq start with 1 increment by 1;
 
 create table soknad_under_arbeid
 (
@@ -53,7 +53,7 @@ create index index_opplvedl_soknaduaid on opplastet_vedlegg (soknad_under_arbeid
 
 create table sendt_soknad
 (
-    sendt_soknad_id         numeric(19, 0) primary key,
+    sendt_soknad_id         serial primary key,
     behandlingsid           varchar(255) not null unique,
     tilknyttetbehandlingsid varchar(255),
     eier                    varchar(255) not null,
@@ -62,7 +62,8 @@ create table sendt_soknad
     brukerferdigdato        timestamp    not null,
     sendtdato               timestamp,
     orgnr                   varchar(255) not null,
-    navenhetsnavn           varchar(255) not null
+    navenhetsnavn           varchar(255) not null,
+    old_id                  integer      not null unique
 );
 
 create index index_sendtsoknad_tilknbehid on sendt_soknad (tilknyttetbehandlingsid);
@@ -70,7 +71,7 @@ create index index_sendtsoknad_eier on sendt_soknad (eier);
 create index index_sendtsoknad_oppr on sendt_soknad (brukeropprettetdato);
 create index index_sendtsoknad_ferdig on sendt_soknad (brukerferdigdato);
 create index index_sendtsoknad_sendt on sendt_soknad (sendtdato);
-create sequence sendt_soknad_id_seq start with 1 increment by 1;
+-- create sequence sendt_soknad_id_seq start with 1 increment by 1;
 
 create table soknadmetadata
 (
