@@ -1,4 +1,4 @@
-package no.nav.sosialhjelp.soknad.migration.sendtsoknad
+package no.nav.sosialhjelp.soknad.migration.sendtsoknad.domain
 
 import java.time.LocalDateTime
 
@@ -12,5 +12,6 @@ data class SendtSoknad(
     var navEnhetsnavn: String,
     var brukerOpprettetDato: LocalDateTime,
     var brukerFerdigDato: LocalDateTime,
-    var sendtDato: LocalDateTime? = null
+    var sendtDato: LocalDateTime? = null,
+    var oldId: Long
 )
