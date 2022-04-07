@@ -3,6 +3,7 @@ package no.nav.sosialhjelp.soknad.migration.oppgave.dto
 import no.nav.sosialhjelp.soknad.migration.oppgave.domain.DokumentInfo
 import no.nav.sosialhjelp.soknad.migration.oppgave.domain.FiksData
 import no.nav.sosialhjelp.soknad.migration.oppgave.domain.FiksResultat
+import no.nav.sosialhjelp.soknad.migration.oppgave.domain.Oppgave
 import no.nav.sosialhjelp.soknad.migration.oppgave.domain.Status
 import java.time.LocalDateTime
 
@@ -18,7 +19,24 @@ data class OppgaveDto(
     val sistKjort: LocalDateTime?,
     val nesteForsok: LocalDateTime?,
     val retries: Int
-)
+) {
+    fun toDomain(): Oppgave {
+        return Oppgave(
+            id = 0L, // dummy verdi
+            behandlingsId = behandlingsId,
+            type = type,
+            status = status,
+            steg = steg,
+            oppgaveData = oppgaveData?.toFiksData(),
+            oppgaveResultat = oppgaveResultat?.toFiksResultat(),
+            opprettet = opprettet,
+            sistKjort = sistKjort,
+            nesteForsok = nesteForsok,
+            retries = retries,
+            oldId = id
+        )
+    }
+}
 
 data class FiksDataDto(
     val behandlingsId: String?,
