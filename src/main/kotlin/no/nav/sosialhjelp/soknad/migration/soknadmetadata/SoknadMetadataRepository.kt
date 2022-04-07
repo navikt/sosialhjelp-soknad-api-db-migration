@@ -1,6 +1,6 @@
 package no.nav.sosialhjelp.soknad.migration.soknadmetadata
 
-import no.nav.sosialhjelp.soknad.migration.soknadmetadata.dto.JAXB
+import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.JAXB
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.dto.SoknadMetadataDto
 import no.nav.sosialhjelp.soknad.migration.utils.SQLUtils.tidTilTimestamp
 import org.springframework.jdbc.core.JdbcTemplate
@@ -24,7 +24,7 @@ class SoknadMetadataRepository(
             metadata.orgnr,
             metadata.navEnhet,
             metadata.fiksForsendelseId,
-            metadata.vedlegg?.let { JAXB.marshal(it) },
+            metadata.vedlegg?.let { JAXB.marshal(it.toVedleggMedataListe()) },
             metadata.type?.name,
             metadata.status?.name,
             tidTilTimestamp(metadata.opprettetDato),
@@ -48,7 +48,7 @@ class SoknadMetadataRepository(
             metadata.orgnr,
             metadata.navEnhet,
             metadata.fiksForsendelseId,
-            metadata.vedlegg?.let { JAXB.marshal(it) },
+            metadata.vedlegg?.let { JAXB.marshal(it.toVedleggMedataListe()) },
             metadata.type?.name,
             metadata.status?.name,
             tidTilTimestamp(metadata.sistEndretDato),

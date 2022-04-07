@@ -1,6 +1,6 @@
 package no.nav.sosialhjelp.soknad.migration.oppgave
 
-import no.nav.sosialhjelp.soknad.migration.oppgave.dto.JAXB
+import no.nav.sosialhjelp.soknad.migration.oppgave.domain.JAXB
 import no.nav.sosialhjelp.soknad.migration.oppgave.dto.OppgaveDto
 import no.nav.sosialhjelp.soknad.migration.utils.SQLUtils.tidTilTimestamp
 import org.springframework.jdbc.core.JdbcTemplate
@@ -21,8 +21,8 @@ class OppgaveRepository(
             oppgave.type,
             oppgave.status.name,
             oppgave.steg,
-            oppgave.oppgaveData?.let { JAXB.marshal(it) },
-            oppgave.oppgaveResultat?.let { JAXB.marshal(it) },
+            oppgave.oppgaveData?.let { JAXB.marshal(it.toFiksData()) },
+            oppgave.oppgaveResultat?.let { JAXB.marshal(it.toFiksResultat()) },
             tidTilTimestamp(oppgave.opprettet),
             tidTilTimestamp(oppgave.sistKjort),
             tidTilTimestamp(oppgave.nesteForsok),
@@ -42,8 +42,8 @@ class OppgaveRepository(
             oppgave.type,
             oppgave.status.name,
             oppgave.steg,
-            oppgave.oppgaveData?.let { JAXB.marshal(it) },
-            oppgave.oppgaveResultat?.let { JAXB.marshal(it) },
+            oppgave.oppgaveData?.let { JAXB.marshal(it.toFiksData()) },
+            oppgave.oppgaveResultat?.let { JAXB.marshal(it.toFiksResultat()) },
             tidTilTimestamp(oppgave.sistKjort),
             tidTilTimestamp(oppgave.nesteForsok),
             oppgave.retries,

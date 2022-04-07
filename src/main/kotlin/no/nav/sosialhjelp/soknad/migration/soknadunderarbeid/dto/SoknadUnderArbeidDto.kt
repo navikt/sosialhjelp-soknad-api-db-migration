@@ -1,6 +1,8 @@
 package no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.dto
 
 import no.nav.sbl.soknadsosialhjelp.soknad.JsonInternalSoknad
+import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.dto.OpplastetVedleggDto
+import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.domain.SoknadUnderArbeidStatus
 import java.time.LocalDateTime
 
 data class SoknadUnderArbeidDto(
@@ -12,9 +14,6 @@ data class SoknadUnderArbeidDto(
     val jsonInternalSoknad: JsonInternalSoknad?,
     val status: SoknadUnderArbeidStatus,
     val opprettetDato: LocalDateTime,
-    val sistEndretDato: LocalDateTime
+    val sistEndretDato: LocalDateTime,
+    val opplastetVedleggListe: List<OpplastetVedleggDto>
 )
-
-enum class SoknadUnderArbeidStatus {
-    UNDER_ARBEID, LAAST
-}
