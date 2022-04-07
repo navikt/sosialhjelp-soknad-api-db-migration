@@ -13,10 +13,12 @@ class SoknadMetadataService(
      * Hvis ikke, opprett ny rad.
      */
     fun addOrUpdate(dto: SoknadMetadataDto) {
-        if (soknadMetadataRepository.exists(dto.id)) {
-            soknadMetadataRepository.oppdater(dto)
+        val soknadMetadata = dto.toDomain()
+
+        if (soknadMetadataRepository.exists(soknadMetadata.oldId)) {
+            soknadMetadataRepository.oppdater(soknadMetadata)
         } else {
-            soknadMetadataRepository.opprett(dto)
+            soknadMetadataRepository.opprett(soknadMetadata)
         }
     }
 }
