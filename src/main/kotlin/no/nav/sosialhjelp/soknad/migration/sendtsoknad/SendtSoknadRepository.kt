@@ -1,6 +1,6 @@
 package no.nav.sosialhjelp.soknad.migration.sendtsoknad
 
-import no.nav.sosialhjelp.soknad.migration.sendtsoknad.dto.SendtSoknadDto
+import no.nav.sosialhjelp.soknad.migration.sendtsoknad.domain.SendtSoknad
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
@@ -12,7 +12,7 @@ class SendtSoknadRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
 
-    fun opprett(sendtSoknad: SendtSoknadDto): Long {
+    fun opprett(sendtSoknad: SendtSoknad): Long {
         val sendtSoknadId = jdbcTemplate.queryForObject<Long>("select nextval('sendt_soknad_id_seq')")
         jdbcTemplate.update(
             "insert into sendt_soknad (sendt_soknad_id, behandlingsid, tilknyttetbehandlingsid, eier, fiksforsendelseid, orgnr, navenhetsnavn, brukeropprettetdato, brukerferdigdato, sendtdato, old_id) values (?,?,?,?,?,?,?,?,?,?,?)",
@@ -26,7 +26,7 @@ class SendtSoknadRepository(
             Date.from(sendtSoknad.brukerOpprettetDato.atZone(ZoneId.systemDefault()).toInstant()),
             Date.from(sendtSoknad.brukerFerdigDato.atZone(ZoneId.systemDefault()).toInstant()),
             sendtSoknad.sendtDato?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) },
-            sendtSoknad.sendtSoknadId
+            sendtSoknad.oldId
         )
         return sendtSoknadId
     }
@@ -35,7 +35,7 @@ class SendtSoknadRepository(
         return jdbcTemplate.queryForObject("select exists(select 1 from sendt_soknad where old_id = ?)", Boolean::class.java, oldId)
     }
 
-    fun oppdater(sendtSoknad: SendtSoknadDto) {
+    fun oppdater(sendtSoknad: SendtSoknad) {
         jdbcTemplate.update(
             "update sendt_soknad set behandlingsid = ?, tilknyttetbehandlingsid = ?, eier = ?, fiksforsendelseid = ?, orgnummer = ?, navenhetsnavn = ?, brukerferdigdato = ?, sendtdato = ? where old_id = ?",
             sendtSoknad.behandlingsId,
@@ -46,7 +46,7 @@ class SendtSoknadRepository(
             sendtSoknad.navEnhetsnavn,
             Date.from(sendtSoknad.brukerFerdigDato.atZone(ZoneId.systemDefault()).toInstant()),
             sendtSoknad.sendtDato?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) },
-            sendtSoknad.sendtSoknadId
+            sendtSoknad.oldId
         )
     }
 

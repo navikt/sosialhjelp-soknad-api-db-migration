@@ -1,5 +1,6 @@
 package no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.dto
 
+import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.domain.OpplastetVedlegg
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.domain.OpplastetVedleggType
 
 data class OpplastetVedleggDto(
@@ -37,5 +38,18 @@ data class OpplastetVedleggDto(
         result = 31 * result + filnavn.hashCode()
         result = 31 * result + sha512.hashCode()
         return result
+    }
+
+    fun toDomain(): OpplastetVedlegg {
+        return OpplastetVedlegg(
+            id = 0L, // dummy id
+            uuid = uuid,
+            eier = eier,
+            vedleggType = vedleggType,
+            data = data,
+            soknadId = soknadId,
+            filnavn = filnavn,
+            sha512 = sha512
+        )
     }
 }

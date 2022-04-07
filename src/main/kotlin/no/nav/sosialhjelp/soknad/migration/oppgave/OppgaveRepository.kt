@@ -1,7 +1,7 @@
 package no.nav.sosialhjelp.soknad.migration.oppgave
 
 import no.nav.sosialhjelp.soknad.migration.oppgave.domain.JAXB
-import no.nav.sosialhjelp.soknad.migration.oppgave.dto.OppgaveDto
+import no.nav.sosialhjelp.soknad.migration.oppgave.domain.Oppgave
 import no.nav.sosialhjelp.soknad.migration.utils.SQLUtils.tidTilTimestamp
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.queryForObject
@@ -12,7 +12,7 @@ class OppgaveRepository(
     private val jdbcTemplate: JdbcTemplate
 ) {
 
-    fun opprett(oppgave: OppgaveDto) {
+    fun opprett(oppgave: Oppgave) {
         val id: Long = jdbcTemplate.queryForObject("select nextval('oppgave_id_seq')")
         jdbcTemplate.update(
             "insert into oppgave (id, behandlingsid, type, status, steg, oppgavedata, oppgaveresultat, opprettet, sistkjort, nesteforsok, retries, old_id) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -21,13 +21,13 @@ class OppgaveRepository(
             oppgave.type,
             oppgave.status.name,
             oppgave.steg,
-            oppgave.oppgaveData?.let { JAXB.marshal(it.toFiksData()) },
-            oppgave.oppgaveResultat?.let { JAXB.marshal(it.toFiksResultat()) },
+            oppgave.oppgaveData?.let { JAXB.marshal(it) },
+            oppgave.oppgaveResultat?.let { JAXB.marshal(it) },
             tidTilTimestamp(oppgave.opprettet),
             tidTilTimestamp(oppgave.sistKjort),
             tidTilTimestamp(oppgave.nesteForsok),
             oppgave.retries,
-            oppgave.id
+            oppgave.oldId
         )
     }
 
@@ -35,19 +35,19 @@ class OppgaveRepository(
         return jdbcTemplate.queryForObject("select exists(select 1 from oppgave where old_id = ?)", Boolean::class.java, oldId)
     }
 
-    fun oppdater(oppgave: OppgaveDto) {
+    fun oppdater(oppgave: Oppgave) {
         jdbcTemplate.update(
             "update oppgave set behandlingsid = ?, type = ?, status = ?, steg = ?, oppgavedata = ?, oppgaveresultat = ?, sistkjort = ?, nesteforsok = ?, retries = ? where old_id = ?",
             oppgave.behandlingsId,
             oppgave.type,
             oppgave.status.name,
             oppgave.steg,
-            oppgave.oppgaveData?.let { JAXB.marshal(it.toFiksData()) },
-            oppgave.oppgaveResultat?.let { JAXB.marshal(it.toFiksResultat()) },
+            oppgave.oppgaveData?.let { JAXB.marshal(it) },
+            oppgave.oppgaveResultat?.let { JAXB.marshal(it) },
             tidTilTimestamp(oppgave.sistKjort),
             tidTilTimestamp(oppgave.nesteForsok),
             oppgave.retries,
-            oppgave.id
+            oppgave.oldId
         )
     }
 
