@@ -9,14 +9,16 @@ class OppgaveService(
 ) {
 
     /**
-     * Hvis dto.id finnes fra før, oppdater raden.
-     * Hvis ikke, opprett ny rad.
+     * Hvis id finnes fra før, oppdater oppgave.
+     * Hvis ikke, opprett ny oppgave.
      */
-    fun addOrUpdateOppgave(dto: OppgaveDto) {
-        if (oppgaveRepository.exists(dto.id)) {
-            oppgaveRepository.oppdater(dto)
+    fun addOrUpdate(dto: OppgaveDto) {
+        val oppgave = dto.toDomain()
+
+        if (oppgaveRepository.exists(oppgave.oldId)) {
+            oppgaveRepository.oppdater(oppgave)
         } else {
-            oppgaveRepository.opprett(dto)
+            oppgaveRepository.opprett(oppgave)
         }
     }
 }
