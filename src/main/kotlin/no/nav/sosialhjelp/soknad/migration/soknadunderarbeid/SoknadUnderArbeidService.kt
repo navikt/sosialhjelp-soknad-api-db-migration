@@ -13,10 +13,12 @@ class SoknadUnderArbeidService(
      * Hvis ikke, opprett ny rad.
      */
     fun addOrUpdate(dto: SoknadUnderArbeidDto) {
-        if (soknadUnderArbeidRepository.exists(dto.soknadId)) {
-            soknadUnderArbeidRepository.oppdater(dto)
+        val soknadUnderArbeid = dto.toDomain()
+
+        if (soknadUnderArbeidRepository.exists(soknadUnderArbeid.oldId)) {
+            soknadUnderArbeidRepository.oppdater(soknadUnderArbeid)
         } else {
-            soknadUnderArbeidRepository.opprett(dto)
+            soknadUnderArbeidRepository.opprett(soknadUnderArbeid)
         }
     }
 }

@@ -8,7 +8,7 @@ import no.nav.sbl.soknadsosialhjelp.json.JsonSosialhjelpValidator
 import no.nav.sbl.soknadsosialhjelp.soknad.JsonInternalSoknad
 import no.nav.sbl.soknadsosialhjelp.soknad.adresse.JsonAdresse
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggRepository
-import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.dto.SoknadUnderArbeidDto
+import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.domain.SoknadUnderArbeid
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.queryForObject
@@ -30,7 +30,7 @@ class SoknadUnderArbeidRepository(
     private val mapper: ObjectMapper = ObjectMapper().addMixIn(JsonAdresse::class.java, AdresseMixIn::class.java)
     private val writer: ObjectWriter = mapper.writerWithDefaultPrettyPrinter()
 
-    fun opprett(soknadUnderArbeid: SoknadUnderArbeidDto): Long {
+    fun opprett(soknadUnderArbeid: SoknadUnderArbeid): Long {
         val id: Long = jdbcTemplate.queryForObject("select nextval('soknad_under_arbeid_id_seq')")
         jdbcTemplate.update(
             "insert into soknad_under_arbeid (soknad_under_arbeid_id, versjon, behandlingsid, tilknyttetbehandlingsid, eier, data, status, opprettetdato, sistendretdato, old_id) values (?,?,?,?,?,?,?,?,?,?)",
@@ -43,7 +43,7 @@ class SoknadUnderArbeidRepository(
             soknadUnderArbeid.status.toString(),
             Date.from(soknadUnderArbeid.opprettetDato.atZone(ZoneId.systemDefault()).toInstant()),
             Date.from(soknadUnderArbeid.sistEndretDato.atZone(ZoneId.systemDefault()).toInstant()),
-            soknadUnderArbeid.soknadId
+            soknadUnderArbeid.oldId
         )
         return id
     }
@@ -52,7 +52,7 @@ class SoknadUnderArbeidRepository(
         return jdbcTemplate.queryForObject("select exists(select 1 from soknad_under_arbeid where old_id = ?)", Boolean::class.java, oldId)
     }
 
-    fun oppdater(soknadUnderArbeid: SoknadUnderArbeidDto) {
+    fun oppdater(soknadUnderArbeid: SoknadUnderArbeid) {
         jdbcTemplate.update(
             "update soknad_under_arbeid set versjon = ?, behandlingsid = ?, tilknyttetbehandlingsid = ?, eier = ?, data = ?, status = ?, sistendretdato = ? where old_id = ?",
             soknadUnderArbeid.versjon,
@@ -62,19 +62,16 @@ class SoknadUnderArbeidRepository(
             soknadUnderArbeid.jsonInternalSoknad?.let { mapJsonSoknadInternalTilFil(it) },
             soknadUnderArbeid.status.toString(),
             Date.from(soknadUnderArbeid.sistEndretDato.atZone(ZoneId.systemDefault()).toInstant()),
-            soknadUnderArbeid.soknadId
+            soknadUnderArbeid.oldId
         )
     }
 
-    fun slett(soknadUnderArbeid: SoknadUnderArbeidDto) {
+    fun slett(soknadUnderArbeid: SoknadUnderArbeid) {
         transactionTemplate.execute(object : TransactionCallbackWithoutResult() {
             override fun doInTransactionWithoutResult(transactionStatus: TransactionStatus) {
-                val soknadUnderArbeidId = soknadUnderArbeid.soknadId
-                opplastetVedleggRepository.slettAlleVedleggForSoknad(soknadUnderArbeidId)
-                jdbcTemplate.update(
-                    "delete from soknad_under_arbeid where soknad_under_arbeid_id = ?",
-                    soknadUnderArbeidId
-                )
+                val id = soknadUnderArbeid.id
+                opplastetVedleggRepository.slettAlleVedleggForSoknad(id)
+                jdbcTemplate.update("delete from soknad_under_arbeid where soknad_under_arbeid_id = ?", id)
             }
         })
     }
