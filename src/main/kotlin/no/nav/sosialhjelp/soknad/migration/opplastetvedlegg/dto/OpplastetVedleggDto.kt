@@ -1,5 +1,7 @@
 package no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.dto
 
+import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.domain.OpplastetVedleggType
+
 data class OpplastetVedleggDto(
     val uuid: String,
     val eier: String,
@@ -37,7 +39,3 @@ data class OpplastetVedleggDto(
         return result
     }
 }
-
-data class OpplastetVedleggType(
-    val sammensattType: String
-)

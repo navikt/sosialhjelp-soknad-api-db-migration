@@ -1,59 +1,67 @@
 package no.nav.sosialhjelp.soknad.migration.oppgave.dto
 
-import com.migesok.jaxb.adapter.javatime.LocalDateTimeXmlAdapter
-import no.nav.sosialhjelp.soknad.migration.utils.JAXBHelper
+import no.nav.sosialhjelp.soknad.migration.oppgave.domain.DokumentInfo
+import no.nav.sosialhjelp.soknad.migration.oppgave.domain.FiksData
+import no.nav.sosialhjelp.soknad.migration.oppgave.domain.FiksResultat
+import no.nav.sosialhjelp.soknad.migration.oppgave.domain.Status
 import java.time.LocalDateTime
-import javax.xml.bind.annotation.XmlRootElement
-import javax.xml.bind.annotation.XmlType
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
 
-// dto fra soknad-api
 data class OppgaveDto(
     val id: Long,
     val behandlingsId: String,
     val type: String?,
     val status: Status,
     val steg: Int,
-    val oppgaveData: FiksData?,
-    val oppgaveResultat: FiksResultat?,
+    val oppgaveData: FiksDataDto?,
+    val oppgaveResultat: FiksResultatDto?,
     val opprettet: LocalDateTime?,
     val sistKjort: LocalDateTime?,
     val nesteForsok: LocalDateTime?,
     val retries: Int
 )
 
-enum class Status {
-    KLAR, UNDER_ARBEID, FERDIG, FEILET
+data class FiksDataDto(
+    val behandlingsId: String?,
+    val avsenderFodselsnummer: String?,
+    val mottakerOrgNr: String?,
+    val mottakerNavn: String?,
+    val dokumentInfoer: List<DokumentInfoDto>?,
+    val innsendtDato: LocalDateTime?,
+    val ettersendelsePa: String?,
+) {
+    fun toFiksData(): FiksData {
+        return FiksData(
+            behandlingsId = behandlingsId,
+            avsenderFodselsnummer = avsenderFodselsnummer,
+            mottakerOrgNr = mottakerOrgNr,
+            mottakerNavn = mottakerNavn,
+            dokumentInfoer = dokumentInfoer?.map { it.toDokumentInfo() }?.toMutableList(),
+            innsendtDato = innsendtDato,
+            ettersendelsePa = ettersendelsePa
+        )
+    }
 }
 
-@XmlRootElement
-data class FiksData(
-    val behandlingsId: String? = null,
-    val avsenderFodselsnummer: String? = null,
-    val mottakerOrgNr: String? = null,
-    val mottakerNavn: String? = null,
-    val dokumentInfoer: List<DokumentInfo>? = null,
-    @XmlJavaTypeAdapter(LocalDateTimeXmlAdapter::class)
-    val innsendtDato: LocalDateTime? = null,
-    val ettersendelsePa: String? = null,
-)
+data class DokumentInfoDto(
+    val uuid: String?,
+    val filnavn: String?,
+    val mimetype: String?,
+    val ekskluderesFraPrint: Boolean?
+) {
+    fun toDokumentInfo(): DokumentInfo {
+        return DokumentInfo(
+            uuid = uuid, filnavn = filnavn, mimetype = mimetype, ekskluderesFraPrint = ekskluderesFraPrint
+        )
+    }
+}
 
-@XmlRootElement
-@XmlType(name = "fiksDokumentInfo")
-data class DokumentInfo(
-    val uuid: String? = null,
-    val filnavn: String? = null,
-    val mimetype: String? = null,
-    val ekskluderesFraPrint: Boolean? = false
-)
-
-@XmlRootElement
-data class FiksResultat(
-    val fiksForsendelsesId: String? = null,
-    val feilmelding: String? = null
-)
-
-val JAXB = JAXBHelper(
-    FiksData::class.java,
-    FiksResultat::class.java
-)
+data class FiksResultatDto(
+    val fiksForsendelsesId: String?,
+    val feilmelding: String?
+) {
+    fun toFiksResultat(): FiksResultat {
+        return FiksResultat(
+            fiksForsendelsesId = fiksForsendelsesId, feilmelding = feilmelding
+        )
+    }
+}

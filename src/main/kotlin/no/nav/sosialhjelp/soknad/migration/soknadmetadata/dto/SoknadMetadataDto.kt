@@ -1,9 +1,12 @@
 package no.nav.sosialhjelp.soknad.migration.soknadmetadata.dto
 
 import no.nav.sbl.soknadsosialhjelp.vedlegg.JsonVedlegg
-import no.nav.sosialhjelp.soknad.migration.utils.JAXBHelper
+import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.SoknadMetadataInnsendingStatus
+import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.SoknadMetadataType
+import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.VedleggMetadata
+import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.VedleggMetadataListe
+import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.Vedleggstatus
 import java.time.LocalDateTime
-import javax.xml.bind.annotation.XmlRootElement
 
 data class SoknadMetadataDto(
     val id: Long,
@@ -14,7 +17,7 @@ data class SoknadMetadataDto(
     val orgnr: String?,
     val navEnhet: String?,
     val fiksForsendelseId: String?,
-    val vedlegg: VedleggMetadataListe?,
+    val vedlegg: VedleggMetadataListeDto?,
     val type: SoknadMetadataType?,
     val status: SoknadMetadataInnsendingStatus?,
     val opprettetDato: LocalDateTime,
@@ -23,13 +26,17 @@ data class SoknadMetadataDto(
     val lestDittNav: Boolean
 )
 
-@XmlRootElement
-data class VedleggMetadataListe(
-    val vedleggListe: MutableList<VedleggMetadata>
-)
+data class VedleggMetadataListeDto(
+    val vedleggListe: MutableList<VedleggMetadataDto>
+) {
+    fun toVedleggMedataListe(): VedleggMetadataListe {
+        return VedleggMetadataListe(
+            vedleggListe = vedleggListe.map { it.toVedleggMetadata() }.toMutableList()
+        )
+    }
+}
 
-@XmlRootElement
-data class VedleggMetadata(
+data class VedleggMetadataDto(
     val filUuid: String?,
     val filnavn: String?,
     val mimeType: String?,
@@ -39,25 +46,18 @@ data class VedleggMetadata(
     val tillegg: String?,
     val hendelseType: JsonVedlegg.HendelseType?,
     val hendelseReferanse: String?
-)
-
-enum class SoknadMetadataType {
-    SEND_SOKNAD_KOMMUNAL, SEND_SOKNAD_KOMMUNAL_ETTERSENDING
-}
-
-enum class SoknadMetadataInnsendingStatus {
-    UNDER_ARBEID, FERDIG, AVBRUTT_AV_BRUKER, AVBRUTT_AUTOMATISK, SENDT_MED_DIGISOS_API
-}
-
-enum class Vedleggstatus {
-    VedleggKreves, LastetOpp, VedleggAlleredeSendt;
-
-    fun er(status: Vedleggstatus): Boolean {
-        return this == status
+) {
+    fun toVedleggMetadata(): VedleggMetadata {
+        return VedleggMetadata(
+            filUuid = filUuid,
+            filnavn = filnavn,
+            mimeType = mimeType,
+            filStorrelse = filStorrelse,
+            status = status,
+            skjema = skjema,
+            tillegg = tillegg,
+            hendelseType = hendelseType,
+            hendelseReferanse = hendelseReferanse
+        )
     }
 }
-
-val JAXB = JAXBHelper(
-    VedleggMetadata::class.java,
-    VedleggMetadataListe::class.java
-)
