@@ -1,6 +1,7 @@
 package no.nav.sosialhjelp.soknad.migration.soknadmetadata.dto
 
 import no.nav.sbl.soknadsosialhjelp.vedlegg.JsonVedlegg
+import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.SoknadMetadata
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.SoknadMetadataInnsendingStatus
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.SoknadMetadataType
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.VedleggMetadata
@@ -24,7 +25,28 @@ data class SoknadMetadataDto(
     val sistEndretDato: LocalDateTime,
     val innsendtDato: LocalDateTime?,
     val lestDittNav: Boolean
-)
+) {
+    fun toDomain(): SoknadMetadata {
+        return SoknadMetadata(
+            id = 0L, // dummy id
+            behandlingsId = behandlingsId,
+            tilknyttetBehandlingsId = tilknyttetBehandlingsId,
+            fnr = fnr,
+            skjema = skjema,
+            orgnr = orgnr,
+            navEnhet = navEnhet,
+            fiksForsendelseId = fiksForsendelseId,
+            vedlegg = vedlegg?.toVedleggMedataListe(),
+            type = type,
+            status = status,
+            opprettetDato = opprettetDato,
+            sistEndretDato = sistEndretDato,
+            innsendtDato = innsendtDato,
+            lestDittNav = lestDittNav,
+            oldId = id
+        )
+    }
+}
 
 data class VedleggMetadataListeDto(
     val vedleggListe: MutableList<VedleggMetadataDto>
