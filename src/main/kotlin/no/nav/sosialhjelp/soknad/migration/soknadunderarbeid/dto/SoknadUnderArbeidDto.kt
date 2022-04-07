@@ -20,16 +20,16 @@ data class SoknadUnderArbeidDto(
 ) {
     fun toDomain(): SoknadUnderArbeid {
         return SoknadUnderArbeid(
-            0L, // dummy verdi
-            versjon,
-            behandlingsId,
-            tilknyttetBehandlingsId,
-            eier,
-            jsonInternalSoknad,
-            status,
-            opprettetDato,
-            sistEndretDato,
-            soknadId
+            id = 0L, // dummy verdi
+            versjon = versjon,
+            behandlingsId = behandlingsId,
+            tilknyttetBehandlingsId = tilknyttetBehandlingsId,
+            eier = eier,
+            jsonInternalSoknad = jsonInternalSoknad,
+            status = status,
+            opprettetDato = opprettetDato,
+            sistEndretDato = sistEndretDato,
+            oldId = soknadId
         )
     }
 }
