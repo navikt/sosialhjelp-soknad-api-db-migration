@@ -13,10 +13,12 @@ class SendtSoknadService(
      * Hvis ikke, opprett ny rad.
      */
     fun addOrUpdate(dto: SendtSoknadDto) {
-        if (sendtSoknadRepository.exists(dto.sendtSoknadId)) {
-            sendtSoknadRepository.oppdater(dto)
+        val sendtSoknad = dto.toDomain()
+
+        if (sendtSoknadRepository.exists(sendtSoknad.oldId)) {
+            sendtSoknadRepository.oppdater(sendtSoknad)
         } else {
-            sendtSoknadRepository.opprett(dto)
+            sendtSoknadRepository.opprett(sendtSoknad)
         }
     }
 }
