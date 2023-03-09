@@ -1,32 +1,31 @@
 
 object Versions {
-    const val springboot = "2.6.6"
-    const val kotlin = "1.6.10"
-    const val coroutines = "1.6.0"
-    const val flyway = "8.5.5"
-    const val postgresql = "42.3.3"
-    const val jackson = "2.13.2"
-    const val micrometer = "1.8.4"
-    const val javaJwt = "3.19.1"
-    const val jwksRsa = "0.21.1"
-    const val logstash = "7.0.1"
-    const val nimbusJoseJwt = "9.21"
-    const val jakartaXml = "2.3.3"
-    const val jaxbJavaTimeAdapters = "1.1.3"
-    const val filformat = "1.2022.03.31-14.09-4daafcd63deb"
+    const val springboot = "3.0.4"
+    const val kotlin = "1.8.10"
+    const val coroutines = "1.6.4"
+    const val flyway = "9.15.2"
+    const val postgresql = "42.5.4"
+    const val jackson = "2.14.2"
+    const val micrometer = "1.10.4"
+    const val javaJwt = "4.3.0"
+    const val jwksRsa = "0.22.0"
+    const val logstash = "7.3"
+    const val nimbusJoseJwt = "9.31"
+    const val jakartaXml = "4.0.0"
+    const val filformat = "1.2023.02.09-08.34-aad9baa612d3"
 
     // test
-    const val junit = "5.8.2"
-    const val mockk = "1.12.3"
-    const val h2 = "2.1.210"
+    const val junit = "5.9.2"
+    const val mockk = "1.13.3"
+    const val h2 = "2.1.214"
 }
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.spring") version "1.6.10"
-    id("org.springframework.boot") version "2.6.6"
+    kotlin("jvm") version "1.8.10"
+    kotlin("plugin.spring") version "1.8.10"
+    id("org.springframework.boot") version "3.0.4"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
-    id("org.flywaydb.flyway") version "8.5.5"
+    id("org.flywaydb.flyway") version "9.15.2"
 }
 
 group = "no.nav.sosialhjelp"
@@ -64,7 +63,6 @@ dependencies {
 
     // xml
     implementation("jakarta.xml.bind:jakarta.xml.bind-api:${Versions.jakartaXml}")
-    implementation("com.migesok:jaxb-java-time-adapters:${Versions.jaxbJavaTimeAdapters}")
 
     testRuntimeOnly("com.h2database:h2:${Versions.h2}")
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
