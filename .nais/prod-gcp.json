@@ -1,8 +1,0 @@
-{
-  "ingress": [
-    "https://sosialhjelp-soknad-api-db-migration.intern.nav.no"
-  ],
-  "env": {
-    "SPRING_PROFILES_ACTIVE": "log-kibana"
-  }
-}
