@@ -25,7 +25,7 @@ class ReplicationClient(
     fun getNext(since: LocalDateTime): ReplicationDto? {
         return soknadApiClient
             .get()
-            .uri("/feed")
+            .uri("/feed?sistEndretDato={sistEndretDato}", since)
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono<ReplicationDto>()
