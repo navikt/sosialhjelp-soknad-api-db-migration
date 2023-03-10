@@ -1,4 +1,4 @@
-package no.nav.sosialhjelp.soknad.migration.dto
+package no.nav.sosialhjelp.soknad.migration.replication
 
 import no.nav.sosialhjelp.soknad.migration.oppgave.dto.OppgaveDto
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.dto.SoknadMetadataDto
