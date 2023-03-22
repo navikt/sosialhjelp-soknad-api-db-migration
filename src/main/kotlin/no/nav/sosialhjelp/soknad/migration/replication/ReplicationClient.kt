@@ -31,4 +31,17 @@ class ReplicationClient(
             .bodyToMono<ReplicationDto>()
             .block()
     }
+
+    /**
+     * Hent sjekksum (sum av rader) fra oracle-db
+     */
+    fun getSjekkSum(): SjekksumDto? {
+        return soknadApiClient
+            .get()
+            .uri("/sjekksum")
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono<SjekksumDto>()
+            .block()
+    }
 }
