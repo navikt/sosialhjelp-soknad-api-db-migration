@@ -32,18 +32,12 @@ spec:
       cpu: 5m
       memory: 256Mi
   ingresses:
-    - "https://sosialhjelp-soknad-api-db-migration.intern.nav.no"
+    - "https://sosialhjelp-soknad-api-db-migration.dev.intern.nav.no"
   azure:
     application:
       enabled: true
-  tokenx:
-    enabled: true
-  accessPolicy:
-    outbound:
-      external:
-        - host: "sosialhjelp-soknad-api.prod-fss-pub.nais.io"
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: "log-kibana"
     - name: SOKNAD_API_MIGRATION_API_URL
-      value: "https://sosialhjelp-soknad-api.prod-fss-pub.nais.io/sosialhjelp/soknad-api/internal/migration"
+      value: "http://sosialhjelp-soknad-api/sosialhjelp/soknad-api/internal/migration"
