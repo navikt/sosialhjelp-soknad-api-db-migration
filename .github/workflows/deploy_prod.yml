@@ -1,12 +1,12 @@
 name: Deploy til prod
 on:
   workflow_run:
-    workflows: ["Build image"]    # Venter på at bygg av image er ferdig
-    branches: [master]
-    types:
-      - completed
-  repository_dispatch:
-    types: [deploy_prod_tag]
+#    workflows: ["Build image"]    # Venter på at bygg av image er ferdig
+#    branches: [master]
+#    types:
+#      - completed
+#  repository_dispatch:
+#    types: [deploy_prod_tag]
 
 jobs:
   deploy-fss:
