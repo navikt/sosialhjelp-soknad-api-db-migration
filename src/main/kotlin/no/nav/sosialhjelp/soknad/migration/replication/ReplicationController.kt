@@ -1,5 +1,6 @@
 package no.nav.sosialhjelp.soknad.migration.replication
 
+import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggService
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -7,11 +8,23 @@ import org.springframework.web.bind.annotation.RequestMapping
 @Controller
 @RequestMapping("/migration")
 class ReplicationController(
-    private val replicationService: ReplicationService
+    private val replicationService: ReplicationService,
+    private val opplastetVedleggService: OpplastetVedleggService
 ) {
 
     @PostMapping("/updateAll")
     fun executeUpdates() {
+
+
+
+
+//        pseudokode:
+//        hent data for replikering
+//        Oppdater opplastet_vedlegg
+//        Oppdater soknad_under_arbeid
+//        oppdater soknadmetadata
+//          oppdater oppgave
+
         // todo: innkommende rest-kall (migrering trigges via curl e.l.)
 
         // hent siste sistEndretDato, eller bruk LocalDateTime.MIN hvis ingen finnes.
