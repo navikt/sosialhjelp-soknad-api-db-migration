@@ -2,6 +2,7 @@ package no.nav.sosialhjelp.soknad.migration.replication
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggRepository
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggService
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.domain.OpplastetVedlegg
@@ -10,31 +11,32 @@ import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.dto.OpplastetVedlegg
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.dto.SoknadMetadataDto
 import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.domain.SoknadUnderArbeidStatus
 import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.dto.SoknadUnderArbeidDto
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import java.time.LocalDateTime
 import java.util.*
 
 internal class ReplicationControllerTest {
 
-    private val replicationService: ReplicationService = mockk()
-    private val opplastedVedleggRepository: OpplastetVedleggRepository = mockk()
+    private val replicationServiceMock: ReplicationService = mockk()
+    private val opplastedVedleggRepositoryMock: OpplastetVedleggRepository = mockk()
 
-    private val opplastetVedleggService = OpplastetVedleggService(opplastedVedleggRepository)
+    private val opplastetVedleggService = OpplastetVedleggService(opplastedVedleggRepositoryMock)
 
-    private val replicationController = ReplicationController(replicationService, opplastetVedleggService)
+    private val replicationController = ReplicationController(replicationServiceMock, opplastetVedleggService)
 
 
     @Test
     internal fun `skal oppdatere vedlegg tabell når replikeringsdata inneholder vedlegg`() {
 
-        every { replicationService.hentNesteDataForReplikering(any()) } returns lagReplikeringsresponsMedVedlegg()
-        every { opplastedVedleggRepository.opprett(any()) } returns UUID.randomUUID().toString()
+        val opplastetVedleggSlot = slot<OpplastetVedlegg>()
+        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns lagReplikeringsresponsMedVedlegg()
+        every { opplastedVedleggRepositoryMock.opprett(capture(opplastetVedleggSlot)) }
+        every { opplastedVedleggRepositoryMock.opprett(any()) } returns UUID.randomUUID().toString()
 
-//      TODO verifiser input - capture argument?
+        replicationController.replicateAllEntries()
 
-
-
+        assertThat(opplastetVedleggSlot.captured.eier).isEqualTo("fnr")
 
     }
 

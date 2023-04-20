@@ -12,10 +12,8 @@ class ReplicationController(
     private val opplastetVedleggService: OpplastetVedleggService
 ) {
 
-    @PostMapping("/updateAll")
-    fun executeUpdates() {
-
-
+    @PostMapping("/replicateAll")
+    fun replicateAllEntries() {
 
 
 //        pseudokode:
