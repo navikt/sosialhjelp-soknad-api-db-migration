@@ -22,6 +22,8 @@ internal class ReplicationServiceTest{
 
     }
 
+
+
 //    @Test
 //    internal fun `skal replikere til database når det finnes flere entries å replikere`()
 }

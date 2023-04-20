@@ -1,6 +1,7 @@
 package no.nav.sosialhjelp.soknad.migration.replication
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggRepository
@@ -27,17 +28,25 @@ internal class ReplicationControllerTest {
 
 
     @Test
-    internal fun `skal oppdatere vedlegg tabell når replikeringsdata inneholder vedlegg`() {
+    internal fun `skal oppdatere vedlegg tabell når replikeringsdata inneholder vedlegg som ikke er replikert fra før`() {
 
         val opplastetVedleggSlot = slot<OpplastetVedlegg>()
-        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns lagReplikeringsresponsMedVedlegg()
-        every { opplastedVedleggRepositoryMock.opprett(capture(opplastetVedleggSlot)) }
-        every { opplastedVedleggRepositoryMock.opprett(any()) } returns UUID.randomUUID().toString()
+        val replikeringsrespons = lagReplikeringsresponsMedVedlegg()
+        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns replikeringsrespons
+        every { opplastedVedleggRepositoryMock.opprett(capture(opplastetVedleggSlot)) } returns UUID.randomUUID().toString()
+        every { opplastedVedleggRepositoryMock.exists(any())} returns false
 
         replicationController.replicateAllEntries()
 
+//        TODO vurdere å validere hele vedleggsobjektet - iom at dette er en engagsjobb med mye manuell test i forkant, er det mulig dette holder.
         assertThat(opplastetVedleggSlot.captured.eier).isEqualTo("fnr")
 
+    }
+
+    @Test
+    internal fun `skal hente entries i riktig rekkefolge ved flere entries`(){
+
+//        TODO implementer
     }
 
     private fun lagReplikeringsresponsMedVedlegg(): ReplicationDto? {

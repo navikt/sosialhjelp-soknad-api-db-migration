@@ -4,6 +4,7 @@ import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggServ
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import java.time.LocalDateTime
 
 @Controller
 @RequestMapping("/migration")
@@ -14,6 +15,14 @@ class ReplicationController(
 
     @PostMapping("/replicateAll")
     fun replicateAllEntries() {
+
+        val replikeringsdata = replicationService.hentNesteDataForReplikering(LocalDateTime.now().minusDays(2))
+
+        if (replikeringsdata?.soknadUnderArbeid?.opplastetVedleggListe != null) {
+            for (vedlegg in replikeringsdata.soknadUnderArbeid.opplastetVedleggListe){
+                opplastetVedleggService.add(vedlegg)
+            }
+        }
 
 
 //        pseudokode:
