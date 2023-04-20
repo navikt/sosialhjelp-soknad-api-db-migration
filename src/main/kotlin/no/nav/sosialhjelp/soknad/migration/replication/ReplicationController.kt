@@ -16,12 +16,10 @@ class ReplicationController(
     @PostMapping("/replicateAll")
     fun replicateAllEntries() {
 
-        val replikeringsdata = replicationService.hentNesteDataForReplikering(LocalDateTime.now().minusDays(2))
-
-        if (replikeringsdata?.soknadUnderArbeid?.opplastetVedleggListe != null) {
-            for (vedlegg in replikeringsdata.soknadUnderArbeid.opplastetVedleggListe){
-                opplastetVedleggService.add(vedlegg)
-            }
+        replicationService.hentNesteDataForReplikering(
+            LocalDateTime.now().minusDays(2)
+        )?.soknadUnderArbeid?.opplastetVedleggListe?.forEach { vedlegg ->
+            opplastetVedleggService.add(vedlegg)
         }
 
 
