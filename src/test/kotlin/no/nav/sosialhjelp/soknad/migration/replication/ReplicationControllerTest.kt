@@ -1,7 +1,6 @@
 package no.nav.sosialhjelp.soknad.migration.replication
 
 import io.mockk.every
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggRepository
@@ -31,27 +30,50 @@ internal class ReplicationControllerTest {
     internal fun `skal oppdatere vedlegg tabell når replikeringsdata inneholder vedlegg som ikke er replikert fra før`() {
 
         val opplastetVedleggSlot = slot<OpplastetVedlegg>()
-        val replikeringsrespons = lagReplikeringsresponsMedVedlegg()
+        val replikeringsrespons = lagReplikeringsresponsMedVedlegg(LocalDateTime.now())
         every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns replikeringsrespons
-        every { opplastedVedleggRepositoryMock.opprett(capture(opplastetVedleggSlot)) } returns UUID.randomUUID().toString()
-        every { opplastedVedleggRepositoryMock.exists(any())} returns false
+        every { opplastedVedleggRepositoryMock.opprett(capture(opplastetVedleggSlot)) } returns UUID.randomUUID()
+            .toString()
+        every { opplastedVedleggRepositoryMock.exists(any()) } returns false
 
         replicationController.replicateAllEntries()
 
 //        TODO vurdere å validere hele vedleggsobjektet - iom at dette er en engagsjobb med mye manuell test i forkant, er det mulig dette holder.
-        assertThat(opplastetVedleggSlot.captured.eier).isEqualTo("fnr")
+        assertThat(opplastetVedleggSlot.captured.eier).isEqualTo(replikeringsrespons?.soknadUnderArbeid?.opplastetVedleggListe?.first()?.eier)
 
     }
 
     @Test
-    internal fun `skal hente entries i riktig rekkefolge ved flere entries`(){
+    internal fun `skal prosessere alle vedlegg`() {
+        val opplastetVedleggListe: MutableList<OpplastetVedlegg> = mutableListOf()
+        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns lagReplikeringsresponsMedFlereVedlegg(
+            LocalDateTime.now()
+        )
+        every { opplastedVedleggRepositoryMock.opprett(capture(opplastetVedleggListe)) } returns UUID.randomUUID()
+            .toString()
+        every { opplastedVedleggRepositoryMock.exists(any()) } returns false
 
-//        TODO implementer
+        replicationController.replicateAllEntries()
+        println(opplastetVedleggListe.toString())
+        assertThat(opplastetVedleggListe).size().isEqualTo(3)
+
+
     }
 
-    private fun lagReplikeringsresponsMedVedlegg(): ReplicationDto? {
+    private fun lagReplikeringsresponsMedFlereVedlegg(sistEndretDato: LocalDateTime): ReplicationDto? {
 
-        return ReplicationDto("123", createSoknadMetadata(), createSoknaUnderArbeidMedVedlegg(), null)
+        return ReplicationDto(
+            "123",
+            createSoknadMetadata(),
+            createSoknaUnderArbeidMedFlereVedlegg(sistEndretDato),
+            null
+        )
+    }
+
+
+    private fun lagReplikeringsresponsMedVedlegg(sistEndretDato: LocalDateTime): ReplicationDto? {
+
+        return ReplicationDto("123", createSoknadMetadata(), createSoknaUnderArbeidMedVedlegg(sistEndretDato), null)
 
     }
 
@@ -76,19 +98,9 @@ internal class ReplicationControllerTest {
         )
     }
 
-    private fun createSoknaUnderArbeidMedVedlegg(): SoknadUnderArbeidDto {
+    private fun createSoknaUnderArbeidMedVedlegg(sistEndretDato: LocalDateTime): SoknadUnderArbeidDto {
 
-        val opplastetVedleggListe = listOf(
-            OpplastetVedleggDto(
-                uuid = UUID.randomUUID().toString(),
-                eier = "fnr",
-                vedleggType = OpplastetVedleggType("annet|annet"),
-                data = "hello".toByteArray(),
-                soknadId = 123,
-                filnavn = "filnavn",
-                sha512 = "sha"
-            )
-        )
+        val opplastetVedleggListe = listOf(createOpplastetVedleggDto())
 
         return SoknadUnderArbeidDto(
             soknadId = 123,
@@ -99,8 +111,41 @@ internal class ReplicationControllerTest {
             jsonInternalSoknad = null,
             status = SoknadUnderArbeidStatus.UNDER_ARBEID,
             opprettetDato = LocalDateTime.now(),
-            sistEndretDato = LocalDateTime.now(),
+            sistEndretDato = sistEndretDato,
             opplastetVedleggListe = opplastetVedleggListe
         )
     }
+
+    private fun createSoknaUnderArbeidMedFlereVedlegg(sistEndretDato: LocalDateTime): SoknadUnderArbeidDto? {
+
+
+        val opplastetVedleggListe =
+            listOf(createOpplastetVedleggDto(), createOpplastetVedleggDto(), createOpplastetVedleggDto())
+
+        return SoknadUnderArbeidDto(
+            soknadId = 123,
+            versjon = 456,
+            behandlingsId = "id",
+            tilknyttetBehandlingsId = null,
+            eier = "fnr",
+            jsonInternalSoknad = null,
+            status = SoknadUnderArbeidStatus.UNDER_ARBEID,
+            opprettetDato = LocalDateTime.now(),
+            sistEndretDato = sistEndretDato,
+            opplastetVedleggListe = opplastetVedleggListe
+        )
+    }
+}
+
+private fun createOpplastetVedleggDto(): OpplastetVedleggDto {
+
+    return OpplastetVedleggDto(
+        uuid = UUID.randomUUID().toString(),
+        eier = "fnr",
+        vedleggType = OpplastetVedleggType("annet|annet"),
+        data = "hello".toByteArray(),
+        soknadId = 123,
+        filnavn = "filnavn",
+        sha512 = "sha"
+    )
 }

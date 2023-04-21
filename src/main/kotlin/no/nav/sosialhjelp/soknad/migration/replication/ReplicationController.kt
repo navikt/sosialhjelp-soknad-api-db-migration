@@ -17,7 +17,7 @@ class ReplicationController(
     fun replicateAllEntries() {
 
         replicationService.hentNesteDataForReplikering(
-            LocalDateTime.now().minusDays(2)
+            LocalDateTime.MIN
         )?.soknadUnderArbeid?.opplastetVedleggListe?.forEach { vedlegg ->
             opplastetVedleggService.add(vedlegg)
         }
