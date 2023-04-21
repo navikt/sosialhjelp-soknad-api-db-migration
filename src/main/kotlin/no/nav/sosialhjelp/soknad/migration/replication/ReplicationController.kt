@@ -1,6 +1,7 @@
 package no.nav.sosialhjelp.soknad.migration.replication
 
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggService
+import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.SoknadUnderArbeidService
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -10,16 +11,22 @@ import java.time.LocalDateTime
 @RequestMapping("/migration")
 class ReplicationController(
     private val replicationService: ReplicationService,
-    private val opplastetVedleggService: OpplastetVedleggService
+    private val opplastetVedleggService: OpplastetVedleggService,
+    private val soknadUnderArbeidService: SoknadUnderArbeidService
 ) {
 
     @PostMapping("/replicateAll")
     fun replicateAllEntries() {
 
-        replicationService.hentNesteDataForReplikering(
+        val nesteEntryForReplikering = replicationService.hentNesteDataForReplikering(
             LocalDateTime.MIN
-        )?.soknadUnderArbeid?.opplastetVedleggListe?.forEach { vedlegg ->
-            opplastetVedleggService.add(vedlegg)
+        )
+
+        nesteEntryForReplikering?.soknadUnderArbeid?.let {
+            soknadUnderArbeidService.addOrUpdate(it)
+            it.opplastetVedleggListe.forEach { vedlegg ->
+                opplastetVedleggService.add(vedlegg)
+            }
         }
 
 
