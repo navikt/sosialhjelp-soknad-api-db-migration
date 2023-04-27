@@ -93,7 +93,7 @@ internal class ReplicationControllerTest {
     }
 
     @Test
-    internal fun `skal oppdatere soknad under arbeid`() {
+    internal fun `skal opprette søknad under arbeid når soknad ikke eksisterer fra før`() {
         val soknadUnderArbeidSlot = slot<SoknadUnderArbeid>()
 
         val replikeringsrespons = lagReplikeringsresponsUtenVedlegg(LocalDateTime.now())
@@ -107,6 +107,30 @@ internal class ReplicationControllerTest {
 
         replicationController.replicateAllEntries()
 
+        verify(exactly = 1) { soknadUnderArbeidRepositoryMock.opprett(any()) }
+        verify(exactly = 0) { soknadUnderArbeidRepositoryMock.oppdater(any()) }
+        assertThat(soknadUnderArbeidSlot.captured.eier).isEqualTo(replikeringsrespons.soknadUnderArbeid?.eier)
+    }
+
+
+    @Test
+    internal fun `skal oppdatere søknad under arbeid dersom den finnes fra før`() {
+        val soknadUnderArbeidSlot = slot<SoknadUnderArbeid>()
+
+        val replikeringsrespons = lagReplikeringsresponsUtenVedlegg(LocalDateTime.now())
+        every { soknadMetadataRepositoryMock.exists(any()) } returns false
+        every { soknadMetadataRepositoryMock.opprett(any()) } just Runs
+
+        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns replikeringsrespons
+
+        every { soknadUnderArbeidRepositoryMock.oppdater(capture(soknadUnderArbeidSlot)) } just Runs
+
+        every { soknadUnderArbeidRepositoryMock.exists(any()) } returns true
+
+        replicationController.replicateAllEntries()
+
+        verify(exactly = 1) { soknadUnderArbeidRepositoryMock.oppdater(any()) }
+        verify(exactly = 0) { soknadUnderArbeidRepositoryMock.opprett(any()) }
         assertThat(soknadUnderArbeidSlot.captured.eier).isEqualTo(replikeringsrespons.soknadUnderArbeid?.eier)
     }
 
@@ -151,7 +175,7 @@ internal class ReplicationControllerTest {
         replicationController.replicateAllEntries()
 
         assertThat(soknadUnderArbeidCaptureListe).size().isEqualTo(3)
-        verify (exactly = 3){soknadUnderArbeidRepositoryMock.opprett(any())}
+        verify(exactly = 3) { soknadUnderArbeidRepositoryMock.opprett(any()) }
 
     }
 
