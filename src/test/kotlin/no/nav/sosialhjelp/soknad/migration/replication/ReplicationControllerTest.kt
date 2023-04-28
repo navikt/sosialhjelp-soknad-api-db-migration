@@ -6,6 +6,11 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.sosialhjelp.soknad.migration.oppgave.OppgaveRepository
+import no.nav.sosialhjelp.soknad.migration.oppgave.OppgaveService
+import no.nav.sosialhjelp.soknad.migration.oppgave.domain.Oppgave
+import no.nav.sosialhjelp.soknad.migration.oppgave.domain.Status
+import no.nav.sosialhjelp.soknad.migration.oppgave.dto.OppgaveDto
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggRepository
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggService
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.domain.OpplastetVedlegg
@@ -23,7 +28,7 @@ import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.dto.SoknadUnderArbe
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 internal class ReplicationControllerTest {
 
@@ -31,17 +36,20 @@ internal class ReplicationControllerTest {
     private val opplastedVedleggRepositoryMock: OpplastetVedleggRepository = mockk()
     private val soknadUnderArbeidRepositoryMock: SoknadUnderArbeidRepository = mockk()
     private val soknadMetadataRepositoryMock: SoknadMetadataRepository = mockk()
+    private val oppgaveRepositoryMock: OppgaveRepository = mockk()
 
     private val opplastetVedleggService = OpplastetVedleggService(opplastedVedleggRepositoryMock)
     private val soknadUnderArbeidService = SoknadUnderArbeidService(soknadUnderArbeidRepositoryMock)
     private val soknadMetadataService = SoknadMetadataService(soknadMetadataRepositoryMock)
+    private val oppgaveService = OppgaveService(oppgaveRepositoryMock)
 
     private val replicationController =
         ReplicationController(
             replicationServiceMock,
             opplastetVedleggService,
             soknadUnderArbeidService,
-            soknadMetadataService
+            soknadMetadataService,
+            oppgaveService
         )
 
     @Test
@@ -197,6 +205,31 @@ internal class ReplicationControllerTest {
     }
 
     @Test
+    internal fun `skal opprette oppgave dersom det ikke finnes fra før`() {
+
+        val oppgaveSlot = slot<Oppgave>()
+
+        val replikeringsrespons = lagReplikeringsresponsMedOppgave(LocalDateTime.now())
+
+        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns replikeringsrespons
+
+        every { soknadUnderArbeidRepositoryMock.opprett(any()) } returns 1L
+        every { soknadUnderArbeidRepositoryMock.exists(any()) } returns false
+
+        every { soknadMetadataRepositoryMock.exists(any()) } returns false
+        every { soknadMetadataRepositoryMock.opprett(any()) } just Runs
+
+        every { oppgaveRepositoryMock.exists(any()) } returns false
+        every { oppgaveRepositoryMock.opprett(capture(oppgaveSlot)) } just Runs
+
+        replicationController.replicateAllEntries()
+
+        verify(exactly = 1) { oppgaveRepositoryMock.opprett(any()) }
+        verify(exactly = 0) { oppgaveRepositoryMock.oppdater(any()) }
+        assertThat(oppgaveSlot.captured.behandlingsId).isEqualTo(replikeringsrespons.oppgave?.behandlingsId)
+    }
+
+    @Test
     internal fun `skal oppdatere søknad metadata dersom metadata for søknad finnes fra før`() {
 
         val soknadMetadataSlot = slot<SoknadMetadata>()
@@ -262,6 +295,8 @@ internal class ReplicationControllerTest {
         verify(exactly = 3) { soknadMetadataRepositoryMock.opprett(any()) }
     }
 
+    // TODO tester: Oppgave med fiks data, oppgave med fiksresultat
+
     private fun lagReplikeringsresponsUtenVedlegg(sistEndretDato: LocalDateTime): ReplicationDto {
         return ReplicationDto(
             "123",
@@ -288,6 +323,15 @@ internal class ReplicationControllerTest {
             createSoknadMetadata(sistEndretDato),
             createSoknaUnderArbeidMedVedlegg(sistEndretDato),
             null
+        )
+    }
+
+    private fun lagReplikeringsresponsMedOppgave(sistEndretDato: LocalDateTime): ReplicationDto {
+        return ReplicationDto(
+            "id",
+            createSoknadMetadata(sistEndretDato),
+            createSoknaUnderArbeidUtenVedlegg(sistEndretDato),
+            createOppgave()
         )
     }
 
@@ -362,6 +406,22 @@ internal class ReplicationControllerTest {
             opprettetDato = LocalDateTime.now(),
             sistEndretDato = sistEndretDato,
             opplastetVedleggListe = opplastetVedleggListe
+        )
+    }
+
+    private fun createOppgave(): OppgaveDto {
+        return OppgaveDto(
+            id = 2L,
+            behandlingsId = "134",
+            type = "OppgaveType",
+            status = Status.KLAR,
+            steg = 1,
+            oppgaveData = null,
+            oppgaveResultat = null,
+            opprettet = LocalDateTime.now(),
+            sistKjort = LocalDateTime.now(),
+            nesteForsok = LocalDateTime.now(),
+            retries = 1
         )
     }
 }

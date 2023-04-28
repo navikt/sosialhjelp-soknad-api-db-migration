@@ -1,5 +1,6 @@
 package no.nav.sosialhjelp.soknad.migration.replication
 
+import no.nav.sosialhjelp.soknad.migration.oppgave.OppgaveService
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggService
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.SoknadMetadataService
 import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.SoknadUnderArbeidService
@@ -14,7 +15,8 @@ class ReplicationController(
     private val replicationService: ReplicationService,
     private val opplastetVedleggService: OpplastetVedleggService,
     private val soknadUnderArbeidService: SoknadUnderArbeidService,
-    private val soknadMetadataService: SoknadMetadataService
+    private val soknadMetadataService: SoknadMetadataService,
+    private val oppgaveService: OppgaveService
 ) {
 
     @PostMapping("/replicateAll")
@@ -35,6 +37,10 @@ class ReplicationController(
 
             nesteEntryForReplikering.soknadMetadata.let {
                 soknadMetadataService.addOrUpdate(it)
+            }
+
+            nesteEntryForReplikering.oppgave?.let {
+                oppgaveService.addOrUpdate(it)
             }
 
             nesteDato = nesteEntryForReplikering.soknadMetadata.sistEndretDato
