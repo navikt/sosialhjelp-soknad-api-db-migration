@@ -47,21 +47,9 @@ class ReplicationController(
 
             nesteEntryForReplikering = replicationService.hentNesteDataForReplikering(nesteDato)
         }
-
-//        pseudokode:
-//        hent data for replikering x
-//        Oppdater opplastet_vedlegg x
-//        Oppdater soknad_under_arbeid x
-//        oppdater soknadmetadata x
-//          oppdater oppgave
-
-        // todo: innkommende rest-kall (migrering trigges via curl e.l.)
-
-        // hent siste sistEndretDato, eller bruk LocalDateTime.MIN hvis ingen finnes.
-        // Kall replicationService med sistEndretDato og lagre resultat som sistEndretDato
-        // Iterere videre med bruk av returnert sistEndretDato som input til replicationService, frem til
-        // replicationService returnerer null?
     }
 
-    // todo: endepunkt for å verifisere at replikering er fullført? Se /migration/sjekksum i soknad-api
+    // TODO:
+//  endepunkt for å verifisere at replikering er fullført? Se /migration/sjekksum i soknad-api
+//  sletting av data
 }

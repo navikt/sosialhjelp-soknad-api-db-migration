@@ -19,6 +19,7 @@ import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.dto.OpplastetVedlegg
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.SoknadMetadataRepository
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.SoknadMetadataService
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.SoknadMetadata
+import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.SoknadMetadataInnsendingStatus
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.dto.SoknadMetadataDto
 import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.SoknadUnderArbeidRepository
 import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.SoknadUnderArbeidService
@@ -364,7 +365,8 @@ internal class ReplicationControllerTest {
         verify(exactly = 3) { oppgaveRepositoryMock.opprett(any()) }
     }
 
-    // TODO tester: Oppgave med fiks data, oppgave med fiksresultat
+    // TODO tester: Oppgave med fiks data, oppgave med fiksresultat, søknad under arbeid med jsoninternalsoknad,
+    //  hvordan slår søknad under arbeid-tilknyttet behandlingsid ut?,
 
     private fun lagReplikeringsresponsUtenVedlegg(sistEndretDato: LocalDateTime): ReplicationDto {
         return ReplicationDto(
@@ -417,7 +419,7 @@ internal class ReplicationControllerTest {
             fiksForsendelseId = null,
             vedlegg = null,
             type = null,
-            status = null,
+            status = SoknadMetadataInnsendingStatus.UNDER_ARBEID,
             opprettetDato = LocalDateTime.now(),
             sistEndretDato = sistEndretDato,
             innsendtDato = LocalDateTime.now(),
