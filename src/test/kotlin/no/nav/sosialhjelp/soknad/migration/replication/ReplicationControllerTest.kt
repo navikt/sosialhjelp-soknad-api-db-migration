@@ -13,6 +13,7 @@ import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.domain.OpplastetVedl
 import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.dto.OpplastetVedleggDto
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.SoknadMetadataRepository
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.SoknadMetadataService
+import no.nav.sosialhjelp.soknad.migration.soknadmetadata.domain.SoknadMetadata
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.dto.SoknadMetadataDto
 import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.SoknadUnderArbeidRepository
 import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.SoknadUnderArbeidService
@@ -43,7 +44,6 @@ internal class ReplicationControllerTest {
             soknadMetadataService
         )
 
-
     @Test
     internal fun `skal oppdatere vedlegg tabell når replikeringsdata inneholder vedlegg som ikke er replikert fra før`() {
 
@@ -66,7 +66,6 @@ internal class ReplicationControllerTest {
 
 //        TODO vurdere å validere hele vedleggsobjektet - iom at dette er en engagsjobb med mye manuell test i forkant, er det mulig dette holder.
         assertThat(opplastetVedleggSlot.captured.eier).isEqualTo(replikeringsrespons.soknadUnderArbeid?.opplastetVedleggListe?.first()?.eier)
-
     }
 
     @Test
@@ -88,8 +87,6 @@ internal class ReplicationControllerTest {
         replicationController.replicateAllEntries()
 
         assertThat(opplastetVedleggListe).size().isEqualTo(3)
-
-
     }
 
     @Test
@@ -111,7 +108,6 @@ internal class ReplicationControllerTest {
         verify(exactly = 0) { soknadUnderArbeidRepositoryMock.oppdater(any()) }
         assertThat(soknadUnderArbeidSlot.captured.eier).isEqualTo(replikeringsrespons.soknadUnderArbeid?.eier)
     }
-
 
     @Test
     internal fun `skal oppdatere søknad under arbeid dersom den finnes fra før`() {
@@ -135,7 +131,7 @@ internal class ReplicationControllerTest {
     }
 
     @Test
-    internal fun `skal oppdatere alle soknader under arbeid`() {
+    internal fun `skal opprette alle soknader under arbeid`() {
 
         val soknadUnderArbeidCaptureListe: MutableList<SoknadUnderArbeid> = mutableListOf()
 
@@ -176,7 +172,72 @@ internal class ReplicationControllerTest {
 
         assertThat(soknadUnderArbeidCaptureListe).size().isEqualTo(3)
         verify(exactly = 3) { soknadUnderArbeidRepositoryMock.opprett(any()) }
+    }
 
+    @Test
+    internal fun `skal opprette søknad metadata dersom det ikke finnes fra før`() {
+
+        val soknadMetadataSlot = slot<SoknadMetadata>()
+
+        val replikeringsrespons = lagReplikeringsresponsUtenVedlegg(LocalDateTime.now())
+
+        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns replikeringsrespons
+
+        every { soknadUnderArbeidRepositoryMock.opprett(any()) } returns 1L
+        every { soknadUnderArbeidRepositoryMock.exists(any()) } returns false
+
+        every { soknadMetadataRepositoryMock.exists(any()) } returns false
+        every { soknadMetadataRepositoryMock.opprett(capture(soknadMetadataSlot)) } just Runs
+
+        replicationController.replicateAllEntries()
+
+        verify(exactly = 1) { soknadMetadataRepositoryMock.opprett(any()) }
+        verify(exactly = 0) { soknadMetadataRepositoryMock.oppdater(any()) }
+        assertThat(soknadMetadataSlot.captured.fnr).isEqualTo(replikeringsrespons.soknadMetadata.fnr)
+    }
+
+    @Test
+    internal fun `skal opprette soknadmetadata for alle forekomster`() {
+
+        val soknadMetadataCaptureListe: MutableList<SoknadMetadata> = mutableListOf()
+
+        val replikeringsresponsForste = lagReplikeringsresponsUtenVedlegg(LocalDateTime.now().minusDays(20))
+        val replikeringsresponsAndre = lagReplikeringsresponsMedFlereVedlegg(LocalDateTime.now().minusDays(10))
+        val replikeringsresponsTredje = lagReplikeringsresponsMedVedlegg(LocalDateTime.now().minusDays(1))
+
+        every { replicationServiceMock.hentNesteDataForReplikering(LocalDateTime.MIN) } returns replikeringsresponsForste
+
+        every {
+            replicationServiceMock.hentNesteDataForReplikering(
+                replikeringsresponsForste.soknadUnderArbeid?.sistEndretDato ?: LocalDateTime.now()
+            )
+        } returns replikeringsresponsAndre
+
+        every {
+            replicationServiceMock.hentNesteDataForReplikering(
+                replikeringsresponsAndre.soknadUnderArbeid?.sistEndretDato ?: LocalDateTime.now()
+            )
+        } returns replikeringsresponsTredje
+
+        every {
+            replicationServiceMock.hentNesteDataForReplikering(
+                replikeringsresponsTredje.soknadUnderArbeid?.sistEndretDato ?: LocalDateTime.now()
+            )
+        } returns null
+
+        every { opplastedVedleggRepositoryMock.exists(any()) } returns false
+        every { opplastedVedleggRepositoryMock.opprett(any()) } returns UUID.randomUUID().toString()
+
+        every { soknadUnderArbeidRepositoryMock.opprett(any()) } returns 1L
+        every { soknadUnderArbeidRepositoryMock.exists(any()) } returns false
+
+        every { soknadMetadataRepositoryMock.exists(any()) } returns false
+        every { soknadMetadataRepositoryMock.opprett(capture(soknadMetadataCaptureListe)) } just Runs
+
+        replicationController.replicateAllEntries()
+
+        assertThat(soknadMetadataCaptureListe).size().isEqualTo(3)
+        verify(exactly = 3) { soknadMetadataRepositoryMock.opprett(any()) }
     }
 
     private fun lagReplikeringsresponsUtenVedlegg(sistEndretDato: LocalDateTime): ReplicationDto {
@@ -186,9 +247,7 @@ internal class ReplicationControllerTest {
             createSoknaUnderArbeidUtenVedlegg(sistEndretDato),
             null
         )
-
     }
-
 
     private fun lagReplikeringsresponsMedFlereVedlegg(sistEndretDato: LocalDateTime): ReplicationDto {
 
@@ -200,7 +259,6 @@ internal class ReplicationControllerTest {
         )
     }
 
-
     private fun lagReplikeringsresponsMedVedlegg(sistEndretDato: LocalDateTime): ReplicationDto {
 
         return ReplicationDto(
@@ -209,7 +267,6 @@ internal class ReplicationControllerTest {
             createSoknaUnderArbeidMedVedlegg(sistEndretDato),
             null
         )
-
     }
 
     private fun createSoknadMetadata(sistEndretDato: LocalDateTime): SoknadMetadataDto {
@@ -268,7 +325,6 @@ internal class ReplicationControllerTest {
     }
 
     private fun createSoknaUnderArbeidMedFlereVedlegg(sistEndretDato: LocalDateTime): SoknadUnderArbeidDto {
-
 
         val opplastetVedleggListe =
             listOf(createOpplastetVedleggDto(), createOpplastetVedleggDto(), createOpplastetVedleggDto())

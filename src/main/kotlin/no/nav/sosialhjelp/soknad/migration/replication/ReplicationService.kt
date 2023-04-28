@@ -1,9 +1,5 @@
 package no.nav.sosialhjelp.soknad.migration.replication
 
-import no.nav.sosialhjelp.soknad.migration.oppgave.OppgaveService
-import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggService
-import no.nav.sosialhjelp.soknad.migration.soknadmetadata.SoknadMetadataService
-import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.SoknadUnderArbeidService
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -12,11 +8,10 @@ class ReplicationService(
     private val replicationClient: ReplicationClient
 ) {
 
-    fun hentNesteDataForReplikering (since: LocalDateTime): ReplicationDto? {
+    fun hentNesteDataForReplikering(since: LocalDateTime): ReplicationDto? {
 
         return replicationClient.getNext(since)
     }
-
 
 //    TODO fjerne
 //    fun processUpdatesSince(since: LocalDateTime): LocalDateTime? {

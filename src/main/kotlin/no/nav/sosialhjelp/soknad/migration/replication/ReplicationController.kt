@@ -24,7 +24,7 @@ class ReplicationController(
 
         var nesteEntryForReplikering = replicationService.hentNesteDataForReplikering(nesteDato)
 
-        while (nesteEntryForReplikering!=null && nesteEntryForReplikering.soknadMetadata.sistEndretDato.isAfter(nesteDato))  {
+        while (nesteEntryForReplikering != null && nesteEntryForReplikering.soknadMetadata.sistEndretDato.isAfter(nesteDato)) {
 
             nesteEntryForReplikering.soknadUnderArbeid?.let {
                 soknadUnderArbeidService.addOrUpdate(it)
@@ -40,12 +40,7 @@ class ReplicationController(
             nesteDato = nesteEntryForReplikering.soknadMetadata.sistEndretDato
 
             nesteEntryForReplikering = replicationService.hentNesteDataForReplikering(nesteDato)
-
         }
-
-
-
-
 
 //        pseudokode:
 //        hent data for replikering x
