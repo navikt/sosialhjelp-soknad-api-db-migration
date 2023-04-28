@@ -205,31 +205,6 @@ internal class ReplicationControllerTest {
     }
 
     @Test
-    internal fun `skal opprette oppgave dersom det ikke finnes fra før`() {
-
-        val oppgaveSlot = slot<Oppgave>()
-
-        val replikeringsrespons = lagReplikeringsresponsMedOppgave(LocalDateTime.now())
-
-        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns replikeringsrespons
-
-        every { soknadUnderArbeidRepositoryMock.opprett(any()) } returns 1L
-        every { soknadUnderArbeidRepositoryMock.exists(any()) } returns false
-
-        every { soknadMetadataRepositoryMock.exists(any()) } returns false
-        every { soknadMetadataRepositoryMock.opprett(any()) } just Runs
-
-        every { oppgaveRepositoryMock.exists(any()) } returns false
-        every { oppgaveRepositoryMock.opprett(capture(oppgaveSlot)) } just Runs
-
-        replicationController.replicateAllEntries()
-
-        verify(exactly = 1) { oppgaveRepositoryMock.opprett(any()) }
-        verify(exactly = 0) { oppgaveRepositoryMock.oppdater(any()) }
-        assertThat(oppgaveSlot.captured.behandlingsId).isEqualTo(replikeringsrespons.oppgave?.behandlingsId)
-    }
-
-    @Test
     internal fun `skal oppdatere søknad metadata dersom metadata for søknad finnes fra før`() {
 
         val soknadMetadataSlot = slot<SoknadMetadata>()
@@ -293,6 +268,100 @@ internal class ReplicationControllerTest {
 
         assertThat(soknadMetadataCaptureListe).size().isEqualTo(3)
         verify(exactly = 3) { soknadMetadataRepositoryMock.opprett(any()) }
+    }
+
+    @Test
+    internal fun `skal opprette oppgave dersom det ikke finnes fra før`() {
+
+        val oppgaveSlot = slot<Oppgave>()
+
+        val replikeringsrespons = lagReplikeringsresponsMedOppgave(LocalDateTime.now())
+
+        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns replikeringsrespons
+
+        every { soknadUnderArbeidRepositoryMock.opprett(any()) } returns 1L
+        every { soknadUnderArbeidRepositoryMock.exists(any()) } returns false
+
+        every { soknadMetadataRepositoryMock.exists(any()) } returns false
+        every { soknadMetadataRepositoryMock.opprett(any()) } just Runs
+
+        every { oppgaveRepositoryMock.exists(any()) } returns false
+        every { oppgaveRepositoryMock.opprett(capture(oppgaveSlot)) } just Runs
+
+        replicationController.replicateAllEntries()
+
+        verify(exactly = 1) { oppgaveRepositoryMock.opprett(any()) }
+        verify(exactly = 0) { oppgaveRepositoryMock.oppdater(any()) }
+        assertThat(oppgaveSlot.captured.behandlingsId).isEqualTo(replikeringsrespons.oppgave?.behandlingsId)
+    }
+
+    @Test
+    internal fun `skal oppdatere oppgave dersom oppgave finnes fra før`() {
+
+        val oppgaveSlot = slot<Oppgave>()
+
+        val replikeringsrespons = lagReplikeringsresponsMedOppgave(LocalDateTime.now())
+
+        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns replikeringsrespons
+
+        every { soknadUnderArbeidRepositoryMock.opprett(any()) } returns 1L
+        every { soknadUnderArbeidRepositoryMock.exists(any()) } returns false
+
+        every { soknadMetadataRepositoryMock.exists(any()) } returns false
+        every { soknadMetadataRepositoryMock.opprett(any()) } just Runs
+
+        every { oppgaveRepositoryMock.exists(any()) } returns true
+        every { oppgaveRepositoryMock.oppdater(capture(oppgaveSlot)) } just Runs
+
+        replicationController.replicateAllEntries()
+
+        verify(exactly = 1) { oppgaveRepositoryMock.oppdater(any()) }
+        verify(exactly = 0) { oppgaveRepositoryMock.opprett(any()) }
+        assertThat(oppgaveSlot.captured.behandlingsId).isEqualTo(replikeringsrespons.oppgave?.behandlingsId)
+    }
+
+    @Test
+    internal fun `skal opprette alle oppgaver når det er flere oppgaver som skal replikeres`() {
+
+        val oppgaveCaptureListe: MutableList<Oppgave> = mutableListOf()
+
+        val replikeringsresponsForste = lagReplikeringsresponsMedOppgave(LocalDateTime.now().minusDays(20))
+        val replikeringsresponsAndre = lagReplikeringsresponsMedOppgave(LocalDateTime.now().minusDays(10))
+        val replikeringsresponsTredje = lagReplikeringsresponsMedOppgave(LocalDateTime.now().minusDays(1))
+
+        every { replicationServiceMock.hentNesteDataForReplikering(LocalDateTime.MIN) } returns replikeringsresponsForste
+
+        every {
+            replicationServiceMock.hentNesteDataForReplikering(
+                replikeringsresponsForste.soknadUnderArbeid?.sistEndretDato ?: LocalDateTime.now()
+            )
+        } returns replikeringsresponsAndre
+
+        every {
+            replicationServiceMock.hentNesteDataForReplikering(
+                replikeringsresponsAndre.soknadUnderArbeid?.sistEndretDato ?: LocalDateTime.now()
+            )
+        } returns replikeringsresponsTredje
+
+        every {
+            replicationServiceMock.hentNesteDataForReplikering(
+                replikeringsresponsTredje.soknadUnderArbeid?.sistEndretDato ?: LocalDateTime.now()
+            )
+        } returns null
+
+        every { soknadUnderArbeidRepositoryMock.opprett(any()) } returns 1L
+        every { soknadUnderArbeidRepositoryMock.exists(any()) } returns false
+
+        every { soknadMetadataRepositoryMock.exists(any()) } returns false
+        every { soknadMetadataRepositoryMock.opprett(any()) } just Runs
+
+        every { oppgaveRepositoryMock.exists(any()) } returns false
+        every { oppgaveRepositoryMock.opprett(capture(oppgaveCaptureListe)) } just Runs
+
+        replicationController.replicateAllEntries()
+
+        assertThat(oppgaveCaptureListe).size().isEqualTo(3)
+        verify(exactly = 3) { oppgaveRepositoryMock.opprett(any()) }
     }
 
     // TODO tester: Oppgave med fiks data, oppgave med fiksresultat
