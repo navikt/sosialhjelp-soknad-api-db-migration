@@ -69,7 +69,7 @@ internal class ReplicationControllerTest {
     }
 
     @Test
-    internal fun `skal prosessere alle vedlegg`() {
+    internal fun `skal prosessere alle vedlegg når søknad har flere vedlegg`() {
         val opplastetVedleggListe: MutableList<OpplastetVedlegg> = mutableListOf()
         every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns lagReplikeringsresponsMedFlereVedlegg(
             LocalDateTime.now()
@@ -131,7 +131,7 @@ internal class ReplicationControllerTest {
     }
 
     @Test
-    internal fun `skal opprette alle soknader under arbeid`() {
+    internal fun `skal opprette alle soknader under arbeid når det er flere søknader som skal replikeres`() {
 
         val soknadUnderArbeidCaptureListe: MutableList<SoknadUnderArbeid> = mutableListOf()
 
@@ -197,7 +197,29 @@ internal class ReplicationControllerTest {
     }
 
     @Test
-    internal fun `skal opprette soknadmetadata for alle forekomster`() {
+    internal fun `skal oppdatere søknad metadata dersom metadata for søknad finnes fra før`() {
+
+        val soknadMetadataSlot = slot<SoknadMetadata>()
+
+        val replikeringsrespons = lagReplikeringsresponsUtenVedlegg(LocalDateTime.now())
+
+        every { replicationServiceMock.hentNesteDataForReplikering(any()) } returns replikeringsrespons
+
+        every { soknadUnderArbeidRepositoryMock.opprett(any()) } returns 1L
+        every { soknadUnderArbeidRepositoryMock.exists(any()) } returns false
+
+        every { soknadMetadataRepositoryMock.exists(any()) } returns true
+        every { soknadMetadataRepositoryMock.oppdater(capture(soknadMetadataSlot)) } just Runs
+
+        replicationController.replicateAllEntries()
+
+        verify(exactly = 1) { soknadMetadataRepositoryMock.oppdater(any()) }
+        verify(exactly = 0) { soknadMetadataRepositoryMock.opprett(any()) }
+        assertThat(soknadMetadataSlot.captured.fnr).isEqualTo(replikeringsrespons.soknadMetadata.fnr)
+    }
+
+    @Test
+    internal fun `skal opprette soknadmetadata for alle søknader når det er flere søknader som skal replikeres`() {
 
         val soknadMetadataCaptureListe: MutableList<SoknadMetadata> = mutableListOf()
 
