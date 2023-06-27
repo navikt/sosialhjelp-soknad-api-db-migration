@@ -18,6 +18,7 @@ object Versions {
     const val junit = "5.9.2"
     const val mockk = "1.13.3"
     const val h2 = "2.1.214"
+    const val assertj = "3.23.1"
 }
 
 plugins {
@@ -68,6 +69,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
     testImplementation("io.mockk:mockk:${Versions.mockk}")
     testImplementation("org.springframework.boot:spring-boot-starter-test:${Versions.springboot}")
+    testImplementation("org.assertj:assertj-core:${Versions.assertj}")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
