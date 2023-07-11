@@ -21,7 +21,7 @@ object Versions {
 }
 
 plugins {
-    kotlin("jvm") version "1.8.10"
+    kotlin("jvm") version "1.9.0"
     kotlin("plugin.spring") version "1.8.10"
     id("org.springframework.boot") version "3.0.4"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
