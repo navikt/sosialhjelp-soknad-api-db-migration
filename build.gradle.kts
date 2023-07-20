@@ -1,6 +1,6 @@
 
 object Versions {
-    const val springboot = "3.0.4"
+    const val springboot = "3.1.2"
     const val kotlin = "1.8.10"
     const val coroutines = "1.6.4"
     const val flyway = "9.15.2"
