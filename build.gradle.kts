@@ -12,12 +12,16 @@ object Versions {
     const val logstash = "7.3"
     const val nimbusJoseJwt = "9.31"
     const val jakartaXml = "4.0.0"
-    const val filformat = "1.2023.02.09-08.34-aad9baa612d3"
+    const val filformat = "1.2023.06.21-14.54-583dfcc41d77"
+
+    // constraints
+    const val snakeYaml = "2.0"
+    const val netty = "4.1.94.Final"
 
     // test
     const val junit = "5.9.2"
     const val mockk = "1.13.3"
-    const val h2 = "2.1.214"
+    const val h2 = "2.2.220"
 }
 
 plugins {
@@ -68,6 +72,15 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
     testImplementation("io.mockk:mockk:${Versions.mockk}")
     testImplementation("org.springframework.boot:spring-boot-starter-test:${Versions.springboot}")
+
+    constraints {
+        implementation("org.yaml:snakeyaml:${Versions.snakeYaml}") {
+            because("https://github.com/advisories/GHSA-mjmj-j48q-9wg2")
+        }
+        implementation("io.netty:netty-handler:${Versions.netty}") {
+            because("https://github.com/advisories/GHSA-6mjq-h674-j845")
+        }
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
