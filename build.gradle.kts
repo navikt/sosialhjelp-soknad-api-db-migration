@@ -29,7 +29,7 @@ plugins {
     kotlin("plugin.spring") version "1.9.0"
     id("org.springframework.boot") version "3.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "11.5.0"
-    id("org.flywaydb.flyway") version "9.21.0"
+    id("org.flywaydb.flyway") version "10.0.0"
 }
 
 group = "no.nav.sosialhjelp"
