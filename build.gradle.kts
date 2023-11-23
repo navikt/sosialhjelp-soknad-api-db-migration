@@ -26,7 +26,7 @@ object Versions {
 
 plugins {
     kotlin("jvm") version "1.9.0"
-    kotlin("plugin.spring") version "1.9.0"
+    kotlin("plugin.spring") version "1.9.21"
     id("org.springframework.boot") version "3.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "11.5.0"
     id("org.flywaydb.flyway") version "9.21.0"
