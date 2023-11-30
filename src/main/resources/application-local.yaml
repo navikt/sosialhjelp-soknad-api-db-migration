@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   flyway:
     url: jdbc:postgresql://localhost:5432/sosialhjelp-soknad-db
@@ -11,4 +14,12 @@ logging:
   level:
     root: debug
 
-soknad_api_migration_api_url: http://localhost:8080/test
+
+management:
+  endpoints:
+    web:
+      base-path: "/internal"
+      exposure:
+        include: metrics, prometheus
+
+soknad_api_migration_api_url: http://localhost:3000/sosialhjelp/soknad-api/internal/migration

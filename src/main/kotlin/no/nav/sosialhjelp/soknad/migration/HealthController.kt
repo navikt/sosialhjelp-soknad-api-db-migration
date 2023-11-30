@@ -6,13 +6,13 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class HealthController {
 
-    // @GetMapping("/internal/isAlive")
-    // fun isAlive(): String {
-    //     return "Ok"
-    // }
-    //
-    // @GetMapping("/internal/isReady")
-    // fun isReady(): String {
-    //     return "Ok"
-    // }
+    @GetMapping("/internal/isAlive")
+    fun isAlive(): String {
+        return "Ok"
+    }
+
+    @GetMapping("/internal/isReady")
+    fun isReady(): String {
+        return "Ok"
+    }
 }

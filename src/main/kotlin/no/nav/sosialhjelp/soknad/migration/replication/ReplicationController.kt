@@ -5,6 +5,7 @@ import no.nav.sosialhjelp.soknad.migration.opplastetvedlegg.OpplastetVedleggServ
 import no.nav.sosialhjelp.soknad.migration.soknadmetadata.SoknadMetadataService
 import no.nav.sosialhjelp.soknad.migration.soknadunderarbeid.SoknadUnderArbeidService
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import java.time.LocalDateTime
@@ -19,7 +20,7 @@ class ReplicationController(
     private val oppgaveService: OppgaveService
 ) {
 
-    @PostMapping("/replicateAll")
+    @GetMapping("/replicateAll")
     fun replicateAllEntries() {
 
         var nesteDato = LocalDateTime.MIN
