@@ -28,20 +28,20 @@ class ReplicationController(
 
         while (nesteEntryForReplikering != null && nesteEntryForReplikering.soknadMetadata.sistEndretDato.isAfter(nesteDato)) {
 
-            nesteEntryForReplikering.soknadUnderArbeid?.let {
-                soknadUnderArbeidService.addOrUpdate(it)
-                it.opplastetVedleggListe.forEach { vedlegg ->
-                    opplastetVedleggService.add(vedlegg)
-                }
-            }
+            // nesteEntryForReplikering.soknadUnderArbeid?.let {
+            //     soknadUnderArbeidService.addOrUpdate(it)
+            //     it.opplastetVedleggListe.forEach { vedlegg ->
+            //         opplastetVedleggService.add(vedlegg)
+            //     }
+            // }
 
-            nesteEntryForReplikering.soknadMetadata.let {
-                soknadMetadataService.addOrUpdate(it)
-            }
-
-            nesteEntryForReplikering.oppgave?.let {
-                oppgaveService.addOrUpdate(it)
-            }
+            // nesteEntryForReplikering.soknadMetadata.let {
+            //     soknadMetadataService.addOrUpdate(it)
+            // }
+            //
+            // nesteEntryForReplikering.oppgave?.let {
+            //     oppgaveService.addOrUpdate(it)
+            // }
 
             nesteDato = nesteEntryForReplikering.soknadMetadata.sistEndretDato
 

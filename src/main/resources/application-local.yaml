@@ -1,0 +1,14 @@
+spring:
+  flyway:
+    url: jdbc:postgresql://localhost:5432/sosialhjelp-soknad-db
+    user: postgres
+    password: postgres
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sosialhjelp-soknad-db
+    username: postgres
+    password: postgres
+logging:
+  level:
+    root: debug
+
+soknad_api_migration_api_url: http://localhost:8080/test
